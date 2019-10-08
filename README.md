@@ -4,8 +4,11 @@ This repository is mostly for sharing PowerShell scripts to assist with SysAdmin
 are provided to serve as an example for you to modify and suit your own IT automation needs. Please consider thoroughly
 testing these scripts before implementing them into production environments.
 
+*** MIT License
+
 # O365-Import
-Note: For use with an AD on-prem and O365/Exchnage Hybrid environment.
+Note: For use with an AD on-prem and O365/Exchnage Hybrid environment. I execute this script with Admin access to
+to both Exchange Hybrid Server and ADSync Domain Controller. At the beginning, a window wil pop up to request Office365 credentials but you may have to store a Get-Credential for local PSSessions.
 
 This script is an example for how a small/medium sized company can create and import users into AD and have their email provisioned in Office 365. The following actions are performed:
 
