@@ -132,7 +132,7 @@ foreach ($User in $NewADUsers)
                If (!$CheckAlias) 
                     {
                      Write-Output "Alias not in use... Proceeding"
-                     Set-RmoteMailbox $Email -EmailAddresses @{add="$Alias@$Domain"}
+                     Set-RemoteMailbox $Email -EmailAddresses @{add="$Alias@$Domain"}
                     }
 
                Else
