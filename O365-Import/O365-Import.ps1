@@ -126,7 +126,7 @@ foreach ($User in $NewADUsers)
         Set-RemoteMailbox $Email –EmailAddressPolicyEnabled $true
 
         # Check alias, create if not in use 
-        If ($Alias -match "^\d+$")
+        If ($Alias -match "^\D+$")
             {
              $CheckAlias = Get-Recipient -Identity "$Alias@$Domain" -ErrorAction SilentlyContinue
                If (!$CheckAlias) 
