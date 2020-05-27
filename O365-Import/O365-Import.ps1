@@ -123,7 +123,12 @@ foreach ($User in $NewADUsers)
         Enable-RemoteMailbox $Email -PrimarySmtpAddress $Email -RemoteRoutingAddress $RoutingAddress
         Set-RemoteMailbox $Email –EmailAddressPolicyEnabled $true
 
+<<<<<<< HEAD
         If ($Alias -match '^[a-z0-9]+$')
+=======
+        # Check alias, create if not in use 
+        If ($Alias -match "^\D+$")
+>>>>>>> e5d3ee42df03f01fd211fa9228e2c7e9661c53a5
             {
             Write-Output "yes"
              $CheckAlias = Get-Recipient -Identity "$Alias@$Domain" -ErrorAction SilentlyContinue
