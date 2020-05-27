@@ -29,9 +29,9 @@ function Password-Algo # Create generic password based on user's full name and c
 $NewADUsers    = Import-csv .\import_users.csv # Imort CSV rows into $ADUsers variable
 $OU            = "OU=Import,DC=contoso,DC=com"
 $Domain        = "contoso.com"
-$RoutingDomain = "contoso.onmicrosoft.com"
-$ExchangeSVR   = "ExProd1.contoso.local"
-$ADSyncSVR     = "DCProd1.contoso.local"  
+$RoutingDomain = "contosocorp.onmicrosoft.com"
+$ExchangeSVR   = "ex01.contoso.com"
+$ADSyncSVR     = "dc01.contoso.com"  
 Connect-MsolService   # Authenticate to Msol Service 
 
 # ------------------- Begin Script --------------------------------------------
@@ -58,7 +58,7 @@ foreach ($User in $NewADUsers)
 	{
 		 # Output warning if user already exists in AD Domain
 
-		 Write-Warning "A user account with username $Username already exist in $Domain"
+		 Write-Warning "A user account with username $Username already exist in $Domain."
 	}
 	else
 	{
@@ -78,13 +78,11 @@ foreach ($User in $NewADUsers)
             -Path $OU `
             -AccountPassword (convertto-securestring $Password -AsPlainText -Force) -ChangePasswordAtLogon $True
         
-        # Add group logic or default groups here
-
         Add-ADGroupMember -Identity "All Employees" -Members $Username
 
-        # Set optional user properties here
+        # Set optional user properties
 
-        If ($Telephone -match "^\d+$")
+        If ($Telephone)
             {
              Set-ADUser $Username -Replace @{telephoneNumber="$Telephone"}
             }
@@ -96,22 +94,22 @@ foreach ($User in $NewADUsers)
         # Provision O365 License
 
         write-host -fore yellow "Ignore warning about User Not Found"
-        While (-not (Get-MsolUser -UserPrincipalName $Email)) # Pause until user is visible in O365
+        While (-not (Get-MsolUser -UserPrincipalName $Email)) # Pause licensing until user is visible in O365
             {
-              write-host -fore yellow "Sleeping 30 Seconds - Performing ADSync" 
+              write-host -fore yellow "Sleeping 30 Seconds" 
               Start-Sleep -Milliseconds 30000
             }
 
         Set-MsolUser -UserPrincipalName $Email -UsageLocation "US"
         If ($Is_Prem.toLower() -eq 'yes' -or $Is_Prem.ToLower() -eq 'y')
             {
-             Set-MsolUserLicense -UserPrincipalName "$Email" -AddLicenses "Contoso:O365_BUSINESS_PREMIUM" # run Get-MsolAccountSku to see licenses available to your account
+             Set-MsolUserLicense -UserPrincipalName "$Email" -AddLicenses "NewBraunfelsSmokehouse:O365_BUSINESS_PREMIUM"
              Write-Output "Premium License Assigned"
             }
             
         Else
             {
-             Set-MsolUserLicense -UserPrincipalName "$Email" -AddLicenses "Contoso:O365_BUSINESS_ESSENTIALS" # run Get-MsolAccountSku to see licenses available to your account
+             Set-MsolUserLicense -UserPrincipalName "$Email" -AddLicenses "NewBraunfelsSmokehouse:O365_BUSINESS_ESSENTIALS"
              Write-Output "Essentials License Assigned"
             }
         
@@ -125,19 +123,19 @@ foreach ($User in $NewADUsers)
         Enable-RemoteMailbox $Email -PrimarySmtpAddress $Email -RemoteRoutingAddress $RoutingAddress
         Set-RemoteMailbox $Email –EmailAddressPolicyEnabled $true
 
-        # Check alias, create if not in use 
-        If ($Alias -match "^\d+$")
+        If ($Alias -match '^[a-z0-9]+$')
             {
+            Write-Output "yes"
              $CheckAlias = Get-Recipient -Identity "$Alias@$Domain" -ErrorAction SilentlyContinue
                If (!$CheckAlias) 
                     {
                      Write-Output "Alias not in use... Proceeding"
-                     Set-RmoteMailbox $Email -EmailAddresses @{add="$Alias@$Domain"}
+                     Set-RemoteMailbox $Email -EmailAddresses @{add="$Alias@$Domain"}
                     }
 
                Else
                     {
-                     Write-Warning "Alias $Alias@$Domain already in use"
+                     Write-Warning "Alias $Alia@$Doma already in use"
                     } 
             }
          Remove-PSSession $ExchangeSession
