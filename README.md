@@ -23,3 +23,6 @@ Prereqs: RSAT ActiveDirectory Module, Msol module, Exchange Management Shell Acc
   7. Create mailbox and email alias if alias available.
   8. Close connections 
   
+# OU-SG-Sync
+
+This script mirrors the membership of an Organizational Unit to a Security Group. It can be scheduled to run in Task Scheduler or set to sleep. 
